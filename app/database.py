@@ -53,7 +53,7 @@ def init_db(app):
                 id           INTEGER PRIMARY KEY AUTOINCREMENT,
                 isim         TEXT NOT NULL,
                 telefon      TEXT NOT NULL,
-                danisan_tipi TEXT,        -- cocuk | ergen | yetiskin
+                katilimci_tipi TEXT,        -- cocuk | ergen | yetiskin | kurum
                 mesaj        TEXT,
                 tarih        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -62,11 +62,11 @@ def init_db(app):
         kapat_db()
 
 
-def lead_ekle(isim, telefon, mesaj=None, danisan_tipi=None):
+def lead_ekle(isim, telefon, mesaj=None, katilimci_tipi=None):
     """Yeni müşteri adayını kaydeder, eklenen kaydın id'sini döndürür.
 
-    danisan_tipi: bu projeye özel sütun — 'cocuk', 'ergen' veya 'yetiskin'.
-    Merkez doğru uzmana yönlendirebilsin diye tutuyoruz.
+    katilimci_tipi: bu projeye özel sütun — 'cocuk', 'ergen', 'yetiskin'
+    veya 'kurum'. SUNDIA doğru program grubuna yönlendirebilsin diye tutuyoruz.
 
     GÜVENLİK: Değerler SQL metnine ASLA doğrudan eklenmez.
         YANLIŞ:  f"INSERT INTO leads (isim) VALUES ('{isim}')"
@@ -77,8 +77,8 @@ def lead_ekle(isim, telefon, mesaj=None, danisan_tipi=None):
     """
     db = get_db()
     imlec = db.execute(
-        "INSERT INTO leads (isim, telefon, danisan_tipi, mesaj) VALUES (?, ?, ?, ?)",
-        (isim, telefon, danisan_tipi, mesaj),
+        "INSERT INTO leads (isim, telefon, katilimci_tipi, mesaj) VALUES (?, ?, ?, ?)",
+        (isim, telefon, katilimci_tipi, mesaj),
     )
     db.commit()
     return imlec.lastrowid
@@ -92,7 +92,7 @@ def tum_leadler():
     """
     db = get_db()
     satirlar = db.execute(
-        "SELECT id, isim, telefon, danisan_tipi, mesaj, tarih "
+        "SELECT id, isim, telefon, katilimci_tipi, mesaj, tarih "
         "FROM leads ORDER BY id DESC"
     ).fetchall()
     return [dict(satir) for satir in satirlar]

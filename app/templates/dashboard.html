@@ -8,7 +8,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ruh Psikoloji Merkezi — Yönetim Paneli</title>
+  <title>SUNDIA SPACE — Yönetim Paneli</title>
   <style>
     body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
            background:#f4f6f8; color:#1b2733; }
@@ -31,7 +31,7 @@
   <div class="sarmal">
     <div class="ust">
       <div>
-        <h1>Randevu Talepleri</h1>
+        <h1>Program Talepleri</h1>
         <span id="sayac" style="color:#5a6b7b"></span>
       </div>
       <button id="yenileButonu">Yenile</button>
@@ -39,7 +39,7 @@
     <div class="kutu">
       <table>
         <thead>
-          <tr><th>İsim</th><th>Telefon</th><th>Kim için</th><th>Not</th><th>Tarih</th></tr>
+          <tr><th>İsim</th><th>Telefon</th><th>Kim için</th><th>İlgilendiği program</th><th>Tarih</th></tr>
         </thead>
         <tbody id="govde"></tbody>
       </table>
@@ -49,7 +49,7 @@
 
 <script>
 // Veritabanındaki kısa değerleri ekranda okunur etikete çevirir.
-const ETIKET = { cocuk: 'Çocuk', ergen: 'Ergen', yetiskin: 'Yetişkin' };
+const ETIKET = { cocuk: 'Çocuk', ergen: 'Ergen', yetiskin: 'Yetişkin', kurum: 'Kurum' };
 
 const govde = document.getElementById('govde');
 const bosMesaj = document.getElementById('bosMesaj');
@@ -64,7 +64,7 @@ async function leadleriYukle() {
     bosMesaj.hidden = liste.length > 0;
     for (const l of liste) {
       const tr = document.createElement('tr');
-      for (const alan of ['isim', 'telefon', 'danisan_tipi', 'mesaj', 'tarih']) {
+      for (const alan of ['isim', 'telefon', 'katilimci_tipi', 'mesaj', 'tarih']) {
         const td = document.createElement('td');
         td.textContent = ETIKET[l[alan]] || l[alan] || '-';
         tr.appendChild(td);

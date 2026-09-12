@@ -1,10 +1,20 @@
-# SmartLead AI — Ruh Psikoloji Merkezi
+# SmartLead AI — SUNDIA SPACE
 
-Çocuk, ergen ve yetişkin danışanlara yönelik bir psikoloji merkezi için:
-ziyaretçiyle yapay zekâ üzerinden sohbet eden ve **randevu talebi** toplayan sistem.
+**SUNDIA SPACE**, çocuk, ergen, yetişkin ve kurumlara yönelik sanat, müzik,
+hareket, drama, duyusal keşif ve dijital sanat temelli atölye ve programlar
+geliştiren yaratıcı alan markasıdır.
+
+Bu sistem, ziyaretçiyle yapay zekâ üzerinden sohbet edip **program talebi**
+toplayan bir karşılama asistanıdır.
 
 İki arayüz: ziyaretçinin sohbet edip iletişim bıraktığı **karşılama sayfası** ve
-merkezin talepleri gördüğü **yönetim paneli**.
+ekibin talepleri gördüğü **yönetim paneli**.
+
+> **Konumlandırma:** SUNDIA SPACE bir sağlık kuruluşu, klinik veya terapi merkezi
+> değildir. Çerçeve kültürel eğitim ve yaratıcı çalışmalardır. Asistan *terapi,
+> seans, tedavi, hasta, danışan* gibi klinik ifadeleri kullanmaz; **atölye,
+> program, katılımcı, eğitmen** der. Risk içeren bir ifade geçtiğinde sohbeti
+> sürdürmez, 112'ye yönlendirir.
 
 **Yığın:** Python · Flask · SQLite · Groq (`qwen/qwen3.8-27b`) · Wix Velo · Render
 
@@ -16,9 +26,11 @@ merkezin talepleri gördüğü **yönetim paneli**.
 > ```
 > Ardından `.env` içindeki `AI_MODEL` değerini güncelle — kodda hiçbir şey değişmez.
 
-> Yapay zekâ **tanı koymaz, terapi yapmaz, ilaç önermez**. Görevi genel bilgi
-> vermek ve doğru uzman grubuna yönlendirmektir. Risk içeren bir ifade
-> geçtiğinde sohbeti sürdürmez, 112'ye yönlendirir.
+> **Konumlandırma:** SUNDIA SPACE bir sağlık kuruluşu, klinik veya terapi
+> merkezi değildir. Çerçeve kültürel eğitim ve yaratıcı çalışmalardır.
+> Asistan *terapi, seans, tedavi, hasta, katılımcı yerine "danışan"* gibi
+> klinik ifadeleri kullanmaz; **atölye, program, katılımcı, eğitmen** der.
+> Risk içeren bir ifade geçtiğinde sohbeti sürdürmez, 112'ye yönlendirir.
 
 ---
 
@@ -41,7 +53,7 @@ flowchart LR
     G["Groq API<br/>qwen/qwen3.8-27b"]
 
     K -->|"POST /api/sohbet<br/>{mesaj, gecmis}"| RT
-    K -->|"POST /api/leads<br/>{isim, telefon, danisanTipi}"| RT
+    K -->|"POST /api/leads<br/>{isim, telefon, katilimciTipi}"| RT
     P -->|"GET /api/leads"| RT
     RT -->|"yanit_uret()"| AI
     RT -->|"lead_ekle() · tum_leadler()"| DB
@@ -115,13 +127,13 @@ python run.py                     # http://localhost:5001
 |-------|-----|-------|-------|
 | `GET` | `/health` | — | `{"durum": "aktif"}` |
 | `POST` | `/api/sohbet` | `{"mesaj": "...", "gecmis": []}` | `{"basari": true, "cevap": "..."}` |
-| `POST` | `/api/leads` | `{"isim": "...", "telefon": "...", "danisanTipi": "cocuk\|ergen\|yetiskin", "mesaj": "..."}` | `{"basari": true, "id": 1}` |
+| `POST` | `/api/leads` | `{"isim": "...", "telefon": "...", "katilimciTipi": "cocuk\|ergen\|yetiskin", "mesaj": "..."}` | `{"basari": true, "id": 1}` |
 | `GET` | `/api/leads` | — | `{"basari": true, "leadler": [...]}` |
 
 **Durum kodları:** eksik veri `400` · yapay zekâ hatası `503` · yeni kayıt `201`
 
 > Frontend ile backend'in alan adları **birebir aynı** olmalıdır:
-> `mesaj`, `gecmis`, `cevap`, `isim`, `telefon`, `danisanTipi`.
+> `mesaj`, `gecmis`, `cevap`, `isim`, `telefon`, `katilimciTipi`.
 > Bir harf farkı bağlantıyı koparır.
 
 ---

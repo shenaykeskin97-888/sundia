@@ -44,7 +44,7 @@ Sen bunu anlamlı bir isimle değiştirirsin.
 | Text | `cevapAlani` | `.text` ile yanıtı yazar |
 | Input | `isimGirisi` | `.value` |
 | Input | `telefonGirisi` | `.value` |
-| **Dropdown** | `danisanTipi` | `.options` koddan dolar, `.value` okunur |
+| **Dropdown** | `katilimciTipi` | `.options` koddan dolar (çocuk/ergen/yetişkin/kurum) |
 | Button | `kaydetButonu` | `.onClick()` |
 | Text | `formDurumu` | `.text` ile durum mesajı |
 

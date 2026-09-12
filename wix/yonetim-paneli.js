@@ -16,7 +16,7 @@
 import { fetch } from 'wix-fetch';
 
 // Veritabanındaki kısa değerleri ekranda okunur etikete çevirir.
-const ETIKET = { cocuk: 'Çocuk', ergen: 'Ergen', yetiskin: 'Yetişkin' };
+const ETIKET = { cocuk: 'Çocuk', ergen: 'Ergen', yetiskin: 'Yetişkin', kurum: 'Kurum' };
 
 // Karşılama sayfasıyla AYNI adres olmalı.
 const API = 'https://smartlead-ai-sbly.onrender.com';
@@ -57,7 +57,7 @@ async function leadleriYukle() {
             _id: String(lead.id),
             isim: lead.isim,
             telefon: lead.telefon,
-            tip: ETIKET[lead.danisan_tipi] || '-',
+            tip: ETIKET[lead.katilimci_tipi] || '-',
             mesaj: lead.mesaj || '-',
             tarih: lead.tarih
         }));

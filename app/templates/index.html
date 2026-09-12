@@ -9,7 +9,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ruh Psikoloji Merkezi</title>
+  <title>SUNDIA SPACE</title>
   <style>
     :root { --lacivert:#0f2340; --yesil:#16a085; --gri:#f4f6f8; }
     * { box-sizing:border-box; }
@@ -47,10 +47,10 @@
     </header>
 
     <section class="kart">
-      <h2>Size nasıl yardımcı olabiliriz?</h2>
+      <h2>Programlarımızı merak ediyor musunuz?</h2>
       <div id="sohbetAkisi"></div>
       <div class="satir">
-        <input id="girisKutusu" placeholder="Merak ettiğinizi yazın..." autocomplete="off">
+        <input id="girisKutusu" placeholder="Atölyelerimiz hakkında sorun..." autocomplete="off">
         <button id="gonderButonu">Sor</button>
       </div>
     </section>
@@ -61,13 +61,14 @@
         <input id="isim" placeholder="Adınız">
         <input id="telefon" placeholder="Telefon">
       </div>
-      <select id="danisanTipi">
-        <option value="">Görüşme kimin için? (seçiniz)</option>
+      <select id="katilimciTipi">
+        <option value="">Kimin için? (seçiniz)</option>
         <option value="cocuk">Çocuk</option>
         <option value="ergen">Ergen</option>
         <option value="yetiskin">Yetişkin</option>
+        <option value="kurum">Kurum (şirket / okul / anaokulu)</option>
       </select>
-      <textarea id="not" rows="2" placeholder="Kısa notunuz (opsiyonel)"></textarea>
+      <textarea id="not" rows="2" placeholder="Hangi programla ilgileniyorsunuz? (opsiyonel)"></textarea>
       <div class="satir" style="margin-top:10px">
         <button id="kaydetButonu">Kaydet</button>
       </div>
@@ -133,7 +134,7 @@ document.getElementById('kaydetButonu').addEventListener('click', async () => {
       body: JSON.stringify({
         isim,
         telefon,
-        danisanTipi: document.getElementById('danisanTipi').value,
+        katilimciTipi: document.getElementById('katilimciTipi').value,
         mesaj: document.getElementById('not').value.trim()
       })
     });
