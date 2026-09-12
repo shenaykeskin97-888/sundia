@@ -1,0 +1,8 @@
+# SmartLead AI — bagimlilik listesi
+# Kurulum:  pip install -r requirements.txt
+
+Flask==3.1.3          # mikro web sunucusu (backend'in temeli)
+flask-cors==6.0.5     # Wix farkli bir origin -> CORS acik olmali (SART)
+requests==2.34.2      # Groq API'sine HTTP istegi atmak icin
+python-dotenv==1.2.3  # .env dosyasindaki gizli anahtarlari okumak icin
+gunicorn==26.2.0      # Render'da production sunucusu (start komutu)

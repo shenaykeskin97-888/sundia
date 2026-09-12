@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--
+  Karsilama sayfasi — YEREL TEST ARAYUZU
+  Amac: Wix'e gecmeden once Modul F testlerini tarayicida yapabilmek.
+  Wix'teki gercek arayuz  wix/karsilama-sayfasi.js  dosyasinda kurulacak.
+  Buradaki alan adlari (mesaj/gecmis/cevap, isim/telefon) backend ile BIREBIR aynidir.
+-->
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ruh Psikoloji Merkezi</title>
+  <style>
+    :root { --lacivert:#0f2340; --yesil:#16a085; --gri:#f4f6f8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+           background:var(--gri); color:#1b2733; }
+    .sarmal { max-width:860px; margin:0 auto; padding:24px 16px 48px; }
+    header h1 { color:var(--lacivert); margin:0 0 4px; font-size:1.7rem; }
+    header p  { margin:0 0 24px; color:#5a6b7b; }
+    .kart { background:#fff; border-radius:14px; padding:20px;
+            box-shadow:0 2px 12px rgba(15,35,64,.08); margin-bottom:20px; }
+    .kart h2 { margin:0 0 12px; font-size:1.05rem; color:var(--lacivert); }
+    #sohbetAkisi { min-height:160px; max-height:340px; overflow-y:auto;
+                   background:var(--gri); border-radius:10px; padding:12px; margin-bottom:12px; }
+    .balon { padding:9px 13px; border-radius:12px; margin-bottom:8px;
+             max-width:80%; line-height:1.45; white-space:pre-wrap; }
+    .ben { background:var(--lacivert); color:#fff; margin-left:auto; }
+    .ai  { background:#fff; border:1px solid #e2e8f0; }
+    .satir { display:flex; gap:8px; }
+    input, textarea, select { flex:1; padding:11px 13px; border:1px solid #d5dde5;
+                      border-radius:9px; font:inherit; width:100%; background:#fff; }
+    select { margin-bottom:10px; }
+    button { padding:11px 20px; border:0; border-radius:9px; background:var(--yesil);
+             color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+    button:disabled { opacity:.55; cursor:not-allowed; }
+    .alanlar { display:grid; gap:10px; grid-template-columns:1fr 1fr; margin-bottom:10px; }
+    #formDurum { margin-top:10px; font-size:.9rem; min-height:1.2em; }
+    @media (max-width:560px){ .alanlar{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="sarmal">
+    <header>
+      <h1>SmartLead AI</h1>
+      <p>Yerel test arayuzu — Wix'e gecmeden once backend'i burada deneyin.</p>
+    </header>
+
+    <section class="kart">
+      <h2>Size nasıl yardımcı olabiliriz?</h2>
+      <div id="sohbetAkisi"></div>
+      <div class="satir">
+        <input id="girisKutusu" placeholder="Merak ettiğinizi yazın..." autocomplete="off">
+        <button id="gonderButonu">Sor</button>
+      </div>
+    </section>
+
+    <section class="kart">
+      <h2>Sizi arayalım</h2>
+      <div class="alanlar">
+        <input id="isim" placeholder="Adınız">
+        <input id="telefon" placeholder="Telefon">
+      </div>
+      <select id="danisanTipi">
+        <option value="">Görüşme kimin için? (seçiniz)</option>
+        <option value="cocuk">Çocuk</option>
+        <option value="ergen">Ergen</option>
+        <option value="yetiskin">Yetişkin</option>
+      </select>
+      <textarea id="not" rows="2" placeholder="Kısa notunuz (opsiyonel)"></textarea>
+      <div class="satir" style="margin-top:10px">
+        <button id="kaydetButonu">Kaydet</button>
+      </div>
+      <div id="formDurum"></div>
+    </section>
+  </div>
+
+<script>
+const API = '';               // ayni sunucu; Wix'te burasi Render adresi olacak
+const gecmis = [];            // konusma gecmisi: [{role, content}, ...]
+
+const akis  = document.getElementById('sohbetAkisi');
+const giris = document.getElementById('girisKutusu');
+const gonder = document.getElementById('gonderButonu');
+
+function balonEkle(metin, kim) {
+  const d = document.createElement('div');
+  d.className = 'balon ' + kim;
+  d.textContent = metin;
+  akis.appendChild(d);
+  akis.scrollTop = akis.scrollHeight;
+  return d;
+}
+
+async function soruyuGonder() {
+  const mesaj = giris.value.trim();
+  if (!mesaj) return;
+  giris.value = '';
+  balonEkle(mesaj, 'ben');
+  const bekleyen = balonEkle('Dusunuyorum...', 'ai');
+  gonder.disabled = true;
+  try {
+    const yanit = await fetch(API + '/api/sohbet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mesaj: mesaj, gecmis: gecmis })
+    });
+    const veri = await yanit.json();
+    bekleyen.textContent = veri.basari ? veri.cevap : ('Hata: ' + (veri.hata || 'bilinmiyor'));
+    if (veri.basari) {
+      gecmis.push({ role: 'user', content: mesaj });
+      gecmis.push({ role: 'assistant', content: veri.cevap });
+    }
+  } catch (e) {
+    bekleyen.textContent = 'Baglanti hatasi olustu.';
+  } finally {
+    gonder.disabled = false;
+  }
+}
+
+gonder.addEventListener('click', soruyuGonder);
+giris.addEventListener('keypress', e => { if (e.key === 'Enter') soruyuGonder(); });
+
+document.getElementById('kaydetButonu').addEventListener('click', async () => {
+  const durum = document.getElementById('formDurum');
+  const isim = document.getElementById('isim').value.trim();
+  const telefon = document.getElementById('telefon').value.trim();
+  if (!isim || !telefon) { durum.textContent = 'Lütfen isim ve telefon girin.'; return; }
+  try {
+    const yanit = await fetch(API + '/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        isim,
+        telefon,
+        danisanTipi: document.getElementById('danisanTipi').value,
+        mesaj: document.getElementById('not').value.trim()
+      })
+    });
+    const veri = await yanit.json();
+    durum.textContent = veri.basari
+      ? 'Aldık, en kısa sürede sizi arayacağız.'
+      : ('Hata: ' + (veri.hata || ''));
+  } catch (e) {
+    durum.textContent = 'Baglanti hatasi olustu.';
+  }
+});
+</script>
+</body>
+</html>

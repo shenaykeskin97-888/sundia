@@ -1,1 +1,21 @@
+# --- GIZLI: asla GitHub'a gitmeyecek ---
 .env
+
+# --- Sanal ortam ---
+venv/
+.venv/
+
+# --- Veritabani ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# --- Editor / OS ---
+.DS_Store
+.vscode/
+.idea/

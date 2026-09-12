@@ -1,0 +1,34 @@
+# Render Blueprint — servisi tıklayarak değil koddan tanımlar.
+# Render panelinde: New > Blueprint > bu repoyu seç.
+# Tüm ayarlar buradan okunur; elle build/start komutu girmen gerekmez.
+
+services:
+  - type: web
+    name: smartlead-ai
+    runtime: python
+    plan: free
+    region: frankfurt              # Türkiye'ye en yakın ücretsiz bölge
+
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app
+
+    healthCheckPath: /health       # Render canlılığı buradan kontrol eder
+
+    envVars:
+      - key: FLASK_ENV
+        value: production          # DEBUG kapalı, hata detayları gizli
+
+      - key: AI_MODEL
+        value: qwen/qwen3.8-27b
+
+      - key: SECRET_KEY
+        generateValue: true        # Render rastgele üretir, kimse görmez
+
+      # sync: false -> değeri Render panelinden ELLE gireceksin.
+      # Böylece gizli anahtar hiçbir zaman GitHub'a yazılmaz.
+      - key: GROQ_API_KEY
+        sync: false
+
+      - key: CORS_ORIGINS
+        sync: false                # Wix ORIGIN'in — yol yazma!
+                                   # örn. https://kullaniciadi.wixstudio.com

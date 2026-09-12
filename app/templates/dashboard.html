@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!--
+  Yonetim paneli — YEREL TEST ARAYUZU
+  GET /api/leads'ten gelen kayitlari tablo olarak gosterir.
+  Wix'teki gercek panel  wix/yonetim-paneli.js  + Repeater bileseniyle kurulacak.
+-->
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ruh Psikoloji Merkezi — Yönetim Paneli</title>
+  <style>
+    body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+           background:#f4f6f8; color:#1b2733; }
+    .sarmal { max-width:1000px; margin:0 auto; padding:24px 16px 48px; }
+    h1 { color:#0f2340; font-size:1.6rem; margin:0 0 4px; }
+    .ust { display:flex; justify-content:space-between; align-items:center;
+           flex-wrap:wrap; gap:12px; margin-bottom:18px; }
+    button { padding:10px 18px; border:0; border-radius:9px; background:#16a085;
+             color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+    .kutu { background:#fff; border-radius:14px; box-shadow:0 2px 12px rgba(15,35,64,.08);
+            overflow-x:auto; }
+    table { border-collapse:collapse; width:100%; min-width:620px; }
+    th { background:#0f2340; color:#fff; text-align:left; padding:12px 14px; font-size:.85rem; }
+    td { padding:12px 14px; border-top:1px solid #eef2f6; font-size:.92rem; }
+    tr:nth-child(even) td { background:#fafbfc; }
+    .bos { padding:28px 14px; text-align:center; color:#7a8a99; }
+  </style>
+</head>
+<body>
+  <div class="sarmal">
+    <div class="ust">
+      <div>
+        <h1>Randevu Talepleri</h1>
+        <span id="sayac" style="color:#5a6b7b"></span>
+      </div>
+      <button id="yenileButonu">Yenile</button>
+    </div>
+    <div class="kutu">
+      <table>
+        <thead>
+          <tr><th>İsim</th><th>Telefon</th><th>Kim için</th><th>Not</th><th>Tarih</th></tr>
+        </thead>
+        <tbody id="govde"></tbody>
+      </table>
+      <div class="bos" id="bosMesaj" hidden>Henüz talep yok.</div>
+    </div>
+  </div>
+
+<script>
+// Veritabanındaki kısa değerleri ekranda okunur etikete çevirir.
+const ETIKET = { cocuk: 'Çocuk', ergen: 'Ergen', yetiskin: 'Yetişkin' };
+
+const govde = document.getElementById('govde');
+const bosMesaj = document.getElementById('bosMesaj');
+
+async function leadleriYukle() {
+  govde.innerHTML = '';
+  try {
+    const yanit = await fetch('/api/leads');
+    const veri = await yanit.json();
+    const liste = veri.leadler || [];
+    document.getElementById('sayac').textContent = liste.length + ' talep';
+    bosMesaj.hidden = liste.length > 0;
+    for (const l of liste) {
+      const tr = document.createElement('tr');
+      for (const alan of ['isim', 'telefon', 'danisan_tipi', 'mesaj', 'tarih']) {
+        const td = document.createElement('td');
+        td.textContent = ETIKET[l[alan]] || l[alan] || '-';
+        tr.appendChild(td);
+      }
+      govde.appendChild(tr);
+    }
+  } catch (e) {
+    bosMesaj.hidden = false;
+    bosMesaj.textContent = 'Talepler yüklenemedi.';
+  }
+}
+
+document.getElementById('yenileButonu').addEventListener('click', leadleriYukle);
+leadleriYukle();
+</script>
+</body>
+</html>
