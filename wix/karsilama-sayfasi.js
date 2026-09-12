@@ -10,7 +10,7 @@
      #cevapAlani       Text      — yapay zekânın yanıtı
      #isimGirisi       Input     — ad
      #telefonGirisi    Input     — telefon
-     #danisanTipi      Dropdown  — çocuk / ergen / yetişkin
+     #katilimciTipi    Dropdown  — çocuk / ergen / yetişkin / kurum
      #kaydetButonu     Button    — "Beni arayın"
      #formDurumu       Text      — durum / hata mesajı
 
@@ -42,14 +42,15 @@ $w.onReady(function () {
 
     // Dropdown seçeneklerini koddan dolduruyoruz: değerler backend'in
     // beklediği beyaz listeyle (cocuk/ergen/yetiskin) birebir aynı olmalı.
-    $w('#danisanTipi').options = [
+    $w('#katilimciTipi').options = [
         { label: 'Çocuk', value: 'cocuk' },
         { label: 'Ergen', value: 'ergen' },
-        { label: 'Yetişkin', value: 'yetiskin' }
+        { label: 'Yetişkin', value: 'yetiskin' },
+        { label: 'Kurum (şirket / okul / anaokulu)', value: 'kurum' }
     ];
-    $w('#danisanTipi').placeholder = 'Görüşme kimin için?';
+    $w('#katilimciTipi').placeholder = 'Kimin için?';
 
-    $w('#cevapAlani').text = 'Merhaba! Size nasıl yardımcı olabilirim?';
+    $w('#cevapAlani').text = 'Merhaba! SUNDIA atölyeleri hakkında merak ettiklerinizi sorabilirsiniz.';
     $w('#formDurumu').text = '';
 });
 
@@ -101,7 +102,7 @@ async function soruyuGonder() {
 async function leadKaydet() {
     const isim = $w('#isimGirisi').value.trim();
     const telefon = $w('#telefonGirisi').value.trim();
-    const danisanTipi = $w('#danisanTipi').value;   // '' olabilir — opsiyonel
+    const katilimciTipi = $w('#katilimciTipi').value;   // '' olabilir — opsiyonel
 
     if (isim === '' || telefon === '') {
         $w('#formDurumu').text = 'Lütfen isim ve telefon girin.';
@@ -118,7 +119,7 @@ async function leadKaydet() {
             body: JSON.stringify({
                 isim: isim,
                 telefon: telefon,
-                danisanTipi: danisanTipi,
+                katilimciTipi: katilimciTipi,
                 mesaj: ''
             })
         });
@@ -129,7 +130,7 @@ async function leadKaydet() {
             $w('#formDurumu').text = 'Aldık, en kısa sürede sizi arayacağız.';
             $w('#isimGirisi').value = '';
             $w('#telefonGirisi').value = '';
-            $w('#danisanTipi').value = '';
+            $w('#katilimciTipi').value = '';
         } else {
             $w('#formDurumu').text = veri.hata || 'Kayıt yapılamadı.';
         }

@@ -1,34 +1,74 @@
-# Render Blueprint — servisi tıklayarak değil koddan tanımlar.
-# Render panelinde: New > Blueprint > bu repoyu seç.
-# Tüm ayarlar buradan okunur; elle build/start komutu girmen gerekmez.
+# ============================================================
+#  render.yaml — Render Blueprint
+# ============================================================
+#  Bu dosya servisin yapılandırmasını KOD olarak tutar.
+#  Panelde tek tek tıklamak yerine, "New > Blueprint > bu repo"
+#  dediğinde Render tüm ayarları buradan okur.
+#
+#  Faydası: ayarlar da sürüm kontrolünde. Servis silinse bile
+#  bu dosyayla birebir aynısını tekrar kurabilirsin.
+#
+#  Şema: https://render.com/docs/blueprint-spec
+# ============================================================
 
 services:
-  - type: web
-    name: smartlead-ai
-    runtime: python
-    plan: free
-    region: frankfurt              # Türkiye'ye en yakın ücretsiz bölge
+    # ---- KİMLİK -------------------------------------------
+  - name: smartlead-ai          # servis adı; URL'in bir parçası olur
+    type: web                   # web | worker | cron | pserv | keyvalue
+                                # (Blueprint'te "web", API'de "web_service")
+    runtime: python             # çalışma ortamı
+                                # NOT: eski adı "env" idi, artık deprecated
 
+    # ---- KAYNAK -------------------------------------------
+    branch: main                # hangi dal deploy edilecek
+                                # yazılmazsa reponun varsayılan dalı kullanılır
+    autoDeployTrigger: commit   # her commit'te otomatik deploy
+                                # commit | checksPass | off
+                                # NOT: eski adı "autoDeploy" idi, deprecated
+
+    # ---- KAYNAKLAR ----------------------------------------
+    plan: free                  # ücretsiz katman
+                                # UYARI: diski kalıcı DEĞİL — her deploy,
+                                # restart ve uykudan sonra smartlead.db sıfırlanır
+    region: frankfurt           # Türkiye'ye en yakın ücretsiz bölge
+                                # DİKKAT: kurulduktan sonra DEĞİŞTİRİLEMEZ
+
+    # ---- KOMUTLAR -----------------------------------------
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn run:app
+    # gunicorn "run" modülündeki "app" değişkenini arar.
+    # run.py içinde app = create_app() modül seviyesinde tanımlı olmalı,
+    # yoksa "Failed to find application object" hatası alırsın.
 
-    healthCheckPath: /health       # Render canlılığı buradan kontrol eder
+    # ---- SAĞLIK KONTROLÜ ----------------------------------
+    healthCheckPath: /health    # / ile başlamak zorunda
+    # Render buraya istek atar. 200 dönmezse deploy'u başarısız sayar
+    # ve eski sürümü ayakta tutar — bozuk kod canlıya çıkmaz.
 
+    # ---- ORTAM DEĞİŞKENLERİ -------------------------------
     envVars:
+        # -- Açık değerler: doğrudan burada durur --
       - key: FLASK_ENV
-        value: production          # DEBUG kapalı, hata detayları gizli
+        value: production       # config.py ProductionConfig'i seçer (DEBUG=False)
 
       - key: AI_MODEL
-        value: qwen/qwen3.8-27b
+        value: qwen/qwen3.8-27b # model değişirse SADECE burası değişir
 
+      - key: PYTHON_VERSION
+        value: "3.14.3"         # sabitlenmezse Render varsayılanı kullanır
+                                # ve bir gün habersiz değişip build'i kırabilir
+
+        # -- Üretilen değer --
       - key: SECRET_KEY
-        generateValue: true        # Render rastgele üretir, kimse görmez
+        generateValue: true     # Render rastgele 256-bit üretir
+                                # kimse görmez, repoya yazılmaz
 
-      # sync: false -> değeri Render panelinden ELLE gireceksin.
-      # Böylece gizli anahtar hiçbir zaman GitHub'a yazılmaz.
+        # -- Gizli değerler: repoda ASLA durmaz --
       - key: GROQ_API_KEY
-        sync: false
+        sync: false             # Blueprint İLK kurulurken Render sana sorar
+                                # sonraki güncellemelerde bu satır yok sayılır
 
       - key: CORS_ORIGINS
-        sync: false                # Wix ORIGIN'in — yol yazma!
-                                   # örn. https://kullaniciadi.wixstudio.com
+        sync: false             # Wix sitenin ORIGIN'i
+                                # doğru : https://kullaniciadi.wixstudio.com
+                                # yanlış: .../sayfaadi  ← yol yazılmaz
